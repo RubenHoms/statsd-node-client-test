@@ -10,14 +10,18 @@ var StatsD = require('node-statsd'); // https://github.com/sivy/node-statsd
 // Depth = number of instances to be spawned (default 1000)
 // timeout = timeout for each instance (default 1000ms)
 // runTime = Time to run the test (default 15*60*1000 ms)
-// host = StatsD host address.
-// port = StatsD port.
+// host = StatsD host address. (default 'localhost')
+// port = StatsD port. (default 8125)
+// test = Test to execute, either ´load' or 'stress' (default 'load')
+// library = Library to test (default 'lynx')
 var options = {};
 options.depth = argv.d ? argv.d : 1000;
-options.timeout = argv.t ? argv.t : 1000;
+options.timeout = argv.t || argv.t == 0 ? argv.t : 1000;
 options.runTime = argv.r ? argv.r : ( 15*60*1000 );
 options.host = argv.h ? argv.h : 'localhost';
 options.port = argv.p ? argv.p : 8125;
+options.e = argv.e ? argv.e : 'load';
+options.library = argv.l ? argv.l : 'lynx';
 
 // Setup the various libraries
 var metricsLynx = new lynx( options.host, options.port, { prefix:'lynx_test', on_error: function( err ) {
@@ -41,26 +45,22 @@ var metricsStatsD = new StatsD({
 // Read command line arguments to determine what library to test
 switch( argv.l ) {
     case 'lynx':
-        console.log( new Date().toUTCString(), "Starting load test for " + argv.l + " library." );
-        testTools.loadTest( function() {
+        testTools.executeTest( function() {
             metricsLynx.set( 'stress_test', Math.floor( Math.random() * 100 ) + 1 );
         }, options );
         break;
     case 'node-statsd-client':
-        console.log( new Date().toUTCString(), "Starting load test for " + argv.l + " library." );
-        testTools.loadTest( function() {
+        testTools.executeTest( function() {
             metricsClient.gauge( 'client_test.stress_test', Math.floor( Math.random() * 100 ) + 1 );
         }, options );
         break;
     case 'statsd-client':
-        console.log( new Date().toUTCString(), "Starting load test for " + argv.l + " library." );
-        testTools.loadTest( function() {
+        testTools.executeTest( function() {
             metricsSDC.set( 'stress_test', Math.floor( Math.random() * 100 ) + 1 );
         }, options );
         break;
     case 'node-statsd':
-        console.log( new Date().toUTCString(), "Starting load test for " + argv.l + " library." );
-        testTools.loadTest( function() {
+        testTools.executeTest( function() {
             metricsStatsD.set( 'stress_test', Math.floor( Math.random() * 100 ) + 1 );
         }, options );
         break;
@@ -68,14 +68,3 @@ switch( argv.l ) {
         console.log("Error: Specify the library to perform the load test on with '-l <name-of-library'. " +
         "Possible options: lynx, node-statsd-client, statsd-client, node-statsd");
 }
-
-// Load test for lynx
-/*;*/
-
-// Load test for node-statsd-client
-
-// Load test for statsd-client
-/**/
-
-// Load test for node-statsd
-/**/

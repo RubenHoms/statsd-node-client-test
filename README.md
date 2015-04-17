@@ -29,6 +29,7 @@ which will send a stat to statsd every 1000ms.
 There are multiple options which can be overridden through the command line. The options are as follows:
 
 ```
+-e <string>     The type of test to execute, either load or stress (default execute = load)
 -d <number>     Number of setIntervals to spawn. (default depth = 1000)
 -t <number>     Timeout for the interval (default timeout = 1000)
 -r <number>     The time to run the tests for. (default runtime = 15*60*1000 --> 15 minutes)

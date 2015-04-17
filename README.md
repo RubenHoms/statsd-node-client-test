@@ -24,7 +24,7 @@ node test_statsd_client.js -l lynx -d 10000 -t 1000
 ```
 
 This will spawn 10.000 intervals through [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval)
-which will fire every 1000ms.
+which will send a stat to statsd every 1000ms.
 
 There are multiple options which can be overridden through the command line. The options are as follows:
 

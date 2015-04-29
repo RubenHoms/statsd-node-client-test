@@ -1,3 +1,6 @@
+// Internal counter to compare expected load versus actual load
+var metricsSent = 0;
+
 /**
  * This function starts the load test.
  * @param {Object}      options     Options obtained by the CLI.
@@ -10,11 +13,16 @@ function loadTest( callback, options ) {
     for( var i = 0; i < options.depth; i++ ) {
         setInterval( function() {
             callback();
+            metricsSent++;
         }, options.timeout );
     }
 
     setTimeout( function() {
-        console.log( new Date().toUTCString(), "Test finished." );
+        var setLoadPerSecond = options.depth * ( 1000 / options.timeout );
+        var actualLoadPerSecond = metricsSent / (options.runTime / 1000);
+        var difference = 100 - ( 100 * ( actualLoadPerSecond / setLoadPerSecond ) );
+        console.log( new Date().toUTCString(), "Test finished, sent " + metricsSent + " metrics. Expected load:" +
+        setLoadPerSecond +"/s. Actual load: " + actualLoadPerSecond + "/s. Difference: " + difference +"%" );
         process.exit();
     }, options.runTime );
 }
